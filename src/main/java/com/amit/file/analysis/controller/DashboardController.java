@@ -6,12 +6,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -20,11 +23,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/home")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin
 public class DashboardController {
 
+	@GetMapping("/welcome")
+	public String welcome() {
+		return "Welcome";
+	}
+	
 	@PostMapping("/upload")
-	public Map<String, Integer> fileParser(@RequestPart("file") MultipartFile multiPartFile) {
+	public ArrayList<ArrayList<String>> fileParser(@RequestPart("file") MultipartFile multiPartFile) {
 
 		Map<String, Integer> wordCountMap = new HashMap<String, Integer>();
 
@@ -58,8 +66,17 @@ public class DashboardController {
 		} catch (Exception e) {
 			throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
 		}
+		
+		ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
+		for(String key : wordCountMap.keySet()) {
+			ArrayList<String> item = new ArrayList<String>();
+			item.add(key);
+			item.add(wordCountMap.get(key).toString());
+			result.add(item);
+		}
+			
 
-		return wordCountMap;
+		return result;
 	}
 
 	public static File convert(MultipartFile file) throws IOException {
